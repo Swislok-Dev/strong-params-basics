@@ -12,18 +12,48 @@ class PostsController < ApplicationController
 	end
 
 	def create
-	  @post = Post.new(params["post"])
-	  @post.save
-	  redirect_to post_path(@post)
+			# @post = Post.new(post_params)													# Permit fields missing
+		@post = Post.new(post_params(:title, :description))				# Permit fields found
+		@post.save
+		redirect_to post_path(@post)
 	end
 
+		# PREVIOUSLY
+	  # # @post = Post.new(params["post"])																		Updating to code below for strong params
+		# @post = Post.new(params.require(:post).permit(:title, :description))
+
+	  # @post.save
+	  # redirect_to post_path(@post)
+
+
 	def update
-	  @post = Post.find(params[:id])
-	  @post.update(params["post"])
-	  redirect_to post_path(@post)
+		@post = Post.find(params[:id])
+			# @post.update(post_params)															# Permit fields missing
+		@post.update(post_params(:title))													# Permit fields found
+		redirect_to post_path(@post)
 	end
+
+		#	PREVIOUSLY
+	  # @post = Post.find(params[:id])
+
+	  # # @post.update(params["post"])																				Updating to code below for strong params on the update action.
+		# @post.update(params.require(:post).permit(:title))		# Testing for multiple permits on the update action. Remove ':description' to have restricted updates.
+
+	  # redirect_to post_path(@post)
+
 
 	def edit
 	  @post = Post.find(params[:id])
 	end
+
+	private
+
+	def post_params(*args)
+		params.require(:post).permit(*args)
+	end
+
+	# Splat to choose between permitted fields missing
+	# def post_params
+	# 	params.require(:post).permit(:title, :description)
+	# end
 end
